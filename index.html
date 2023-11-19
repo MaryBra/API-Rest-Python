@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predição De Diabetes</title>
+
+    <!-- Adiciona os estilos do Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!--Formatação CSS -->
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Predição de Diabetes</h1>
+        
+        <!--Formulario simples com um campo de entrada para dados e um botao para submit -->
+        <div class="form-group mt-4">
+            <label for="inputData">Digite as informações (Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age):</label>
+            <input type="text" class="form-control" id="inputData" placeholder="ex.:6,148,72,35,0,33.6,0.627,50,1">
+        </div>
+
+        <button class="btn btn-primary" onclick="predict()">Predict</button>
+
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        //Funcao que é chamada ao clicar no botao para enviar os dados
+        function predict() {
+            var inputData = document.getElementById('inputData').value;
+
+            if (!inputData) {
+                alert('Por favor insira algum dado para predição.');
+                return;
+            }
+
+            var dataArray = inputData.split(',').map(Number);
+
+            //Obtem os dados do usuario, os formata e faz uma solicitacao POST para a rota '/predict' no backend
+            fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                mode: 'cors',
+                body: JSON.stringify({ data: dataArray }),
+            })
+            //Exibe a previsao ou mensagem de erro retornadas pelo backend
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = '<p class="mt-3">Prediction: ' + data.prediction + '</p>';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = '<p class="mt-3">Error: ' + error.message + '</p>';
+            });
+        }
+    </script>
+
+    <!-- Adiciona os scripts do Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
